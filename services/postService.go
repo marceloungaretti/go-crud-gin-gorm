@@ -1,7 +1,6 @@
 package services
 
 import (
-	"go-crud-gin-gorm/initializers"
 	"go-crud-gin-gorm/models"
 	"go-crud-gin-gorm/repositories"
 	"go-crud-gin-gorm/utils/errors"
@@ -42,13 +41,11 @@ func UpdatePost(id int, postUpdate models.PostCreate) (*models.PostResponse, *er
 	return post, nil
 }
 
-func DeletePost(id int) (*models.PostResponse, error) {
-	var post models.Post
-
-	if err := initializers.DB.Delete(&models.Post{}, id); err != nil {
-		return nil, err.Error
+func DeletePost(id int) (*models.PostResponse, *errors.RestErr) {
+	post, err := repositories.DeletePost(id)
+	if err != nil {
+		return nil, err
 	}
 
-	postResponse := &models.PostResponse{ID: post.ID, Title: post.Title, Body: post.Body}
-	return postResponse, nil
+	return post, nil
 }

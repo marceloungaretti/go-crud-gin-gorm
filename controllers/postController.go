@@ -81,22 +81,16 @@ func DeletePost(c *gin.Context) {
 	idString := c.Param("id")
 	id, parsingError := strconv.Atoi(idString)
 	if parsingError != nil {
-		c.Status(http.StatusBadRequest)
+		restErr := errors.NewBadRequestError("PC84 - Invalid request")
+		c.JSON(restErr.Status, restErr)
 		return
 	}
 
-	// if _, err := services.GetPost(id); err != nil {
-	// 	if err.Error() == "record not found" {
-	// 		c.Status(http.StatusNotFound)
-	// 		return
-	// 	}
-	// }
-
-	_, err := services.DeletePost(id)
-	if err != nil {
-		c.Status(http.StatusInternalServerError)
+	result, restErr := services.DeletePost(id)
+	if restErr != nil {
+		c.JSON(restErr.Status, restErr)
 		return
 	}
 
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, result)
 }

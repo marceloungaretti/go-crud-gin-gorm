@@ -69,3 +69,21 @@ func UpdatePost(id int, postUpdate models.PostCreate) (*models.PostResponse, *er
 
 	return postResponse, nil
 }
+
+func DeletePost(id int) (*models.PostResponse, *errors.RestErr) {
+	var post models.Post
+	if err := initializers.DB.First(&post, id).Error; err != nil {
+		if err.Error() == "record not found" {
+			restError := errors.NewBadRequestError("PR77 - Post not found")
+			return nil, restError
+		} else {
+			restError := errors.NewInternalServerError("PR80 - Database error")
+			return nil, restError
+		}
+	}
+
+	initializers.DB.Delete(&models.Post{}, id)
+
+	postResponse := &models.PostResponse{ID: post.ID, Title: post.Title, Body: post.Body}
+	return postResponse, nil
+}
